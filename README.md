@@ -118,7 +118,23 @@
  
   ##### Методы:
   - (@Override) public void addViewControllers(ViewControllerRegistry registry) - добавляем контроллер для использования шаблона "home" при переходе на адрес .../
-  
+
+
+## HTML-шаблоны
+
+### home
+Стартовая страница, доступна по адресу: .../
+![image](https://github.com/bmsalikhov/taco/assets/153372291/f165f742-b709-4776-9628-bfafee956705)
+
+### design
+Страница для создания своего тако, доступна по адресу: .../design
+![image](https://github.com/bmsalikhov/taco/assets/153372291/8ca0d61f-40ec-4861-af78-e8e07296caec)
+
+### orderForm
+Страница для заведения заказа, доступна по адресу: .../orders
+![image](https://github.com/bmsalikhov/taco/assets/153372291/8dcd8ded-47d4-40a3-89b8-f460558d60fd)
+
+
 
 
   
