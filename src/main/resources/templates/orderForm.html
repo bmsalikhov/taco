@@ -6,7 +6,7 @@
     <link rel="stylesheet" th:href="@{/styles.css}" />
 </head>
 <body>
-<!--/*@thymesVar id="tacoOrder" type="ru.bmsalikhov.taco.TacoOrder"*/-->
+<!--/*@thymesVar id="tacoOrder" type="ru.bmsalikhov.taco.model.TacoOrder"*/-->
 <form method="POST" th:action="@{/orders}" th:object="${tacoOrder}">
     <h1>Order your taco creations!</h1>
     <img th:src="@{/images/TacoCloud.jpg}"/>

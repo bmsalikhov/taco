@@ -6,10 +6,10 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.Errors;
 import org.springframework.web.bind.annotation.*;
-import ru.bmsalikhov.taco.Ingredient;
-import ru.bmsalikhov.taco.Ingredient.Type;
-import ru.bmsalikhov.taco.Taco;
-import ru.bmsalikhov.taco.TacoOrder;
+import ru.bmsalikhov.taco.model.Ingredient;
+import ru.bmsalikhov.taco.model.Ingredient.Type;
+import ru.bmsalikhov.taco.model.Taco;
+import ru.bmsalikhov.taco.model.TacoOrder;
 
 import java.util.Arrays;
 import java.util.List;

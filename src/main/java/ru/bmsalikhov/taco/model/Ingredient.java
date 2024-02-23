@@ -1,4 +1,4 @@
-package ru.bmsalikhov.taco;
+package ru.bmsalikhov.taco.model;
 
 import lombok.Data;
 

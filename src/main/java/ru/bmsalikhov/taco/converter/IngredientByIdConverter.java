@@ -1,11 +1,12 @@
-package ru.bmsalikhov.taco;
+package ru.bmsalikhov.taco.converter;
 
 import java.util.HashMap;
 import java.util.Map;
 
 import org.springframework.core.convert.converter.Converter;
 import org.springframework.stereotype.Component;
-import ru.bmsalikhov.taco.Ingredient.Type;
+import ru.bmsalikhov.taco.model.Ingredient;
+import ru.bmsalikhov.taco.model.Ingredient.Type;
 
 @Component
 public class IngredientByIdConverter implements Converter<String, Ingredient> {

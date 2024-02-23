@@ -1,10 +1,11 @@
-package ru.bmsalikhov.taco;
+package ru.bmsalikhov.taco.model;
 
 import jakarta.validation.constraints.Digits;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
 import lombok.Data;
 import org.hibernate.validator.constraints.CreditCardNumber;
+import ru.bmsalikhov.taco.model.Taco;
 
 import java.util.ArrayList;
 import java.util.List;

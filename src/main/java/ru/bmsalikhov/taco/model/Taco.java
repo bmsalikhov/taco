@@ -1,8 +1,9 @@
-package ru.bmsalikhov.taco;
+package ru.bmsalikhov.taco.model;
 
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import lombok.Data;
+import ru.bmsalikhov.taco.model.Ingredient;
 
 import java.util.List;
 
