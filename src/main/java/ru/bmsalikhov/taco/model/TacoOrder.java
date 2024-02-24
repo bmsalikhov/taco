@@ -7,11 +7,19 @@ import lombok.Data;
 import org.hibernate.validator.constraints.CreditCardNumber;
 import ru.bmsalikhov.taco.model.Taco;
 
+import java.io.Serial;
+import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 @Data
-public class TacoOrder {
+public class TacoOrder implements Serializable {
+
+    @Serial
+    private static final long serialVersionUID = 1L;
+    private Long id;
+    private Date placedAt;
 
     @NotBlank(message = "Delivery name is required")
     private String deliveryName;
