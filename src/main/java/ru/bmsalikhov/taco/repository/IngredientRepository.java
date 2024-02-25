@@ -1,12 +1,6 @@
 package ru.bmsalikhov.taco.repository;
 
+import org.springframework.data.repository.CrudRepository;
 import ru.bmsalikhov.taco.model.Ingredient;
 
-import java.util.Optional;
-
-public interface IngredientRepository {
-
-    Iterable<Ingredient> findAll();
-    Optional<Ingredient> finById(String id);
-    Ingredient save(Ingredient ingredient);
-}
+public interface IngredientRepository extends CrudRepository<Ingredient, String> {}
