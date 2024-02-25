@@ -11,6 +11,16 @@
 - [Project Lombok](https://mvnrepository.com/artifact/org.projectlombok/lombok/1.18.30)
 - [Spring Boot Starter Test](https://mvnrepository.com/artifact/org.springframework.boot/spring-boot-starter-test/3.2.2)
 - [Spring Boot Starter Validation](https://mvnrepository.com/artifact/org.springframework.boot/spring-boot-starter-validation/3.2.2)
+- [H2 Database Engine](https://mvnrepository.com/artifact/com.h2database/h2/2.2.224)
+- [Spring Boot Starter Data JPA](https://mvnrepository.com/artifact/org.springframework.boot/spring-boot-starter-data-jpa)
+
+## Версии
+### Версия 2.0
+#### Что изменилось:
+- Данные перенес из мапы в базу данных H2 (In memory)
+- Подключение к БД через Spring Boot Starter Data JPA
+- Загрузка статичных данных (список ингридиентов) реализована через DataLoaderConfig
+- Взаимодействие с БД организовано через репозитории
 
 ## Пакеты
 
@@ -18,6 +28,9 @@
 
 - #### DesignTacoController
   Контроллер для составления своего тако
+
+  ##### Поля:
+  - private final IngredientRepository ingredientRepository - инжектим репозиторий с ингридиентами
 
   ##### Аннотации:
   - @Slf4j - логирование
@@ -36,6 +49,9 @@
 - #### OrderController
   Контроллер для оформления заказа
 
+  ##### Поля:
+  - private final OrderRepository orderRepository - инжектим репозиторий с заказами
+
    ##### Аннотации:
   - @Slf4j - логирование
   - @Controller - указываем Spring, что это контроллер 
@@ -52,12 +68,21 @@
   Класс для описания ингредиентов тако
 
   ##### Аннотации:
-  - @Data - реализация стандартных методов от Lombok
+  - @Getter - геттер от Lombok
+  - @Setter - сеттер от Lombok
+  - @ToString - toString() от Lombok
+  - @AllArgsConstructor - конструктор от Lombok
+  - @RequiredArgsConstructor - конструктор от Lombok
+  - @Entity - помечаем данной аннотацией, так как класс является сущностью в БД
 
   ##### Поля:
-  - private final String id - id ингредиента
-  - private final String name - название ингредиента
-  - private final Type type - тип ингредиента
+  - (@Id) private String id - id ингредиента, помечен аннотацией import jakarta.persistence.Id для работы с БД
+  - private String name - название ингредиента
+  - private Type type - тип ингредиента
+ 
+  ##### Методы:
+  - (@Override) public final boolean equals(Object o) - переопределнный equals
+  - (@Override) public final int hashCode() - переопределенный hashCode()
  
   ##### Внутренние классы:
   - public enum Type - обычный enum для хранения типов ингридиентов
@@ -66,19 +91,35 @@
   Класс для описания тако
 
   ##### Аннотации:
-  - @Data - реализация стандартных методов от Lombok
+  - @Getter - геттер от Lombok
+  - @Setter - сеттер от Lombok
+  - @ToString - toString() от Lombok
+  - @AllArgsConstructor - конструктор от Lombok
+  - @RequiredArgsConstructor - конструктор от Lombok
+  - @Entity - помечаем данной аннотацией, так как класс является сущностью в БД
 
   ##### Поля:
+  - (@Id, @GeneratedValue(strategy = GenerationType.AUTO)) private Long id - id придуманного тако, для записи и работы с ним в БД
   - private String name - имя сконструированного клиентом тако. Также включает аннотации @NotNull и @Size(min = 5) для валидации введеного клиентом названия (не нулевое значение и минимум 5 знаков)
   - private List<Ingredient> ingredients - список ингридиентов в придуманном рецепте тако. Также включает аннотации @NotNull и @Size(min = 1) - список не должен быть пустым и должен содержать хотя бы 1 ингридиент
+
+  #### Методы:
+  - (@Override) public final boolean equals(Object o) - переопределнный equals
+  - (@Override) public final int hashCode() - переопределенный hashCode()
  
 - #### TacoOrder
   Класс для описания заказа тако
 
   ##### Аннотации:
-  - @Data - реализация стандартных методов от Lombok
+  - @Getter - геттер от Lombok
+  - @Setter - сеттер от Lombok
+  - @ToString - toString() от Lombok
+  - @AllArgsConstructor - конструктор от Lombok
+  - @RequiredArgsConstructor - конструктор от Lombok
+  - @Entity - помечаем данной аннотацией, так как класс является сущностью в БД
 
   ##### Поля:
+  - (@Id, @GeneratedValue(strategy = GenerationType.AUTO)) private Long id - id придуманного тако, для записи и работы с ним в БД
   - private String deliveryName - имя клиента для заказа + аннотация @NotBlank(message = "Delivery name is required") - не пустое
   - private String deliveryStreet - улицу доставки + аннотация @NotBlank(message = "Street is required") - не пустое
   - private String deliveryCity - город доставки + аннотация @NotBlank(message = "City is required") - не пустое
@@ -87,10 +128,12 @@
   - private String ccNumber - номер карты для оплаты + аннотация @CreditCardNumber(message = "Not a valid credit card number") - валидация введенного номера карты от Hibernate Validator
   - private String ccExpiration - срок действия карты оплаты + аннотация  @Pattern(regexp = "^(0[1-9]|1[0-2])/([2-9][0-9])$", message = "Must be formatted MM/YY") - валидация даты по регулярному выражению
   - private String ccCVV - CVV карты + аннотация @Digits(integer=3, fraction=0, message="Invalid CVV") - валидация CVV
-  - private List<Taco> tacos - список тако в заказе, если клиент решит заказать несколько
+  - (@OneToMany(cascade = CascadeType.ALL)) private List<Taco> tacos - список тако в заказе, если клиент решит заказать несколько + аннотация: все тако в этом списке относятся к этому одному заказу, удаляется каскадно - удаление заказа удаляет все тако из заказа
 
   ##### Методы:
   - public void addTaco(Taco taco) - добавление тако в список тако
+  - (@Override) public final boolean equals(Object o) - переопределнный equals
+  - (@Override) public final int hashCode() - переопределенный hashCode()
  
 ### converter
 
@@ -102,10 +145,9 @@
   - @Component - аннотация для Spring, чтобы сделать bean
 
   ##### Поля:
-  - private final Map<String, Ingredient> ingredientMap = new HashMap<>() - мапа, где "ключ" - это строкое представление ингридиента и "значение" - экземпляр ингридиента
+  - private final IngredientRepository ingredientRepository - подгружаем БД с ингридиентами
 
   ##### Методы:
- - public IngredientByIdConverter() - добавление в мапу всех ингридиентов
  - (@Override) public Ingredient convert(String id) - получает строковый id ингридиента и возвращает экземпляр ингридиента из мапы
 
 ### config
@@ -118,6 +160,15 @@
  
   ##### Методы:
   - (@Override) public void addViewControllers(ViewControllerRegistry registry) - добавляем контроллер для использования шаблона "home" при переходе на адрес .../
+ 
+- #### WebConfig
+  Класс конфигурации. Реализует интерфейс org.springframework.web.servlet.config.annotation.WebMvcConfigurer
+
+  ##### Аннотации:
+  - @Configuration - аннотация для Spring, чтобы показать, что класс является конфигурацией
+ 
+  ##### Методы:
+  - (@Bean) public ApplicationRunner dataLoader(IngredientRepository repo) - загружаем в в репозиторий ингридиентов ингридиенты
 
 
 ## HTML-шаблоны
