@@ -3,14 +3,11 @@ package ru.bmsalikhov.taco.converter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.convert.converter.Converter;
 import org.springframework.stereotype.Component;
-import ru.bmsalikhov.taco.model.IngredientUDT;
+import ru.bmsalikhov.taco.model.Ingredient;
 import ru.bmsalikhov.taco.repository.IngredientRepository;
-import ru.bmsalikhov.taco.utils.TacoUDRUtils;
-
-import java.util.Objects;
 
 @Component
-public class IngredientByIdConverter implements Converter<String, IngredientUDT> {
+public class IngredientByIdConverter implements Converter<String, Ingredient> {
 
     private final IngredientRepository ingredientRepository;
 
@@ -20,7 +17,7 @@ public class IngredientByIdConverter implements Converter<String, IngredientUDT>
     }
 
     @Override
-    public IngredientUDT convert(String id) {
-        return TacoUDRUtils.toIngredientUDT(Objects.requireNonNull(ingredientRepository.findById(id).orElse(null)));
+    public Ingredient convert(String id) {
+        return ingredientRepository.findById(id).orElse(null);
     }
 }
