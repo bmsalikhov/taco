@@ -11,9 +11,13 @@
 - [Project Lombok](https://mvnrepository.com/artifact/org.projectlombok/lombok/1.18.30)
 - [Spring Boot Starter Test](https://mvnrepository.com/artifact/org.springframework.boot/spring-boot-starter-test/3.2.2)
 - [Spring Boot Starter Validation](https://mvnrepository.com/artifact/org.springframework.boot/spring-boot-starter-validation/3.2.2)
-- [Spring Boot Starter Data Cassandra](https://mvnrepository.com/artifact/org.springframework.boot/spring-boot-starter-data-cassandra/3.2.3)
+- [Spring Boot Starter Data MongoDB](https://mvnrepository.com/artifact/org.springframework.boot/spring-boot-starter-data-mongodb/3.2.3)
 
 ## Версии
+
+### Версия 2.2
+#### Что изменилось:
+- Сменил БД на MongoDb
 
 ### Версия 2.1
 #### Что изменилось:
@@ -25,11 +29,6 @@
 - Подключение к БД через Spring Boot Starter Data JPA
 - Загрузка статичных данных (список ингридиентов) реализована через DataLoaderConfig
 - Взаимодействие с БД организовано через репозитории
-
-## Структура БД
-
-![image](https://github.com/bmsalikhov/taco/assets/153372291/148a2622-5f0c-4980-a184-bef299f00f84)
-
 
 ## Пакеты
 
@@ -80,42 +79,26 @@
   - @Data - геттеры, сеттеры и пр. от Lombok
   - @AllArgsConstructor - конструктор от Lombok
   - @NoArgsConstructor(access= AccessLevel.PRIVATE, force=true) - конструктор от Lombok
-  - @Table("ingredients") - аннотация для Cassandra
+  - @Document(collection = "ingredients") - аннотация для Mongo, данные храним в коллекции ingredients
     
   ##### Поля:
-  - (@PrimaryKey) private String id - id ингредиента, помечен аннотацией org.springframework.data.cassandra.core.mapping.PrimaryKey для работы с БД
+  - (@Id) private String id - id ингредиента, помечен аннотацией org.springframework.data.annotation.Id для работы с БД
   - private String name - название ингредиента
   - private Type type - тип ингредиента
  
   ##### Внутренние классы:
   - public enum Type - обычный enum для хранения типов ингридиентов
- 
-- #### IngredientUDT
-  Класс для хранения списка ингридиентов таков в бд
 
-  ##### Аннотации:
-  - @Data - геттеры, сеттеры и пр. от Lombok
-  - @RequiredArgsConstructor - конструктор от Lombok
-  - @NoArgsConstructor (access = AccessLevel.PRIVATE, force = true) - конструктор от Lombok
-  - @UserDefinedType("ingredient") - определяет, как ингридиенты будут храниться в столбце ingridients таблицы tacos
- 
-  #### Поля:
-  - private final String name - название ингридиента
-  - private final Ingredient.Type type - тип ингридиента
- 
 - #### Taco
   Класс для описания тако
 
   ##### Аннотации:
   - @Data - геттеры, сеттеры и пр. от Lombok
-  - @Table("tacos") - аннотация для Cassandra
 
   ##### Поля:
-  - (@PrimaryKeyColumn(type = PrimaryKeyType.PARTITIONED)) private UUID id = Uuids.timeBased() - UUID каждого тако, аннотация говорит, что свойство id играет роль ключа раздела
-  - (@PrimaryKeyColumn(type = PrimaryKeyType.CLUSTERED, ordering = Ordering.DESCENDING)) private Date createdAt = new Date() - дата создания тако, аннотация говорит, что свойство createdAt играет ролю ключа кластеризации + данные в таблице будут храниться в обратном порядке (самые новые тако - выше)
+  - private Date createdAt = new Date() - дата создания тако, аннотация говорит, что свойство createdAt играет ролю ключа кластеризации + данные в таблице будут храниться в обратном порядке (самые новые тако - выше)
   - private String name - имя сконструированного клиентом тако. Также включает аннотации @NotNull и @Size(min = 5) для валидации введеного клиентом названия (не нулевое значение и минимум 5 знаков)
-  - (@Column("ingredients")) private List<IngredientUDT> ingredients - список ингридиентов в придуманном рецепте тако. Также включает аннотации @Size(min = 1) - список должен содержать хотя бы 1 ингридиент + аннотация Cassandra - список хранится в столбце ingredients
-
+  - private List<Ingredient> ingredients - список ингридиентов в придуманном рецепте тако. Также включает аннотации @Size(min = 1) - список должен содержать хотя бы 1 ингридиент
   #### Методы:
   - public void addIngredient(Ingredient ingredient) - добавление ингридиента в список ингридиентов
  
@@ -124,10 +107,10 @@
 
   ##### Аннотации:
   - @Data - геттеры, сеттеры и пр. от Lombok
-  - @Table("orders") - аннотация для Cassandra
+  - @Document - аннотация для Mongo
 
   ##### Поля:
-  - (@PrimaryKey) rivate UUID id = Uuids.timeBased() - id заказа - первичный ключ
+  - (@Id) private String id - id заказа - первичный ключ, помечен аннотацией org.springframework.data.annotation.Id для работы с БД
   - private String deliveryName - имя клиента для заказа + аннотация @NotBlank(message = "Delivery name is required") - не пустое
   - private String deliveryStreet - улицу доставки + аннотация @NotBlank(message = "Street is required") - не пустое
   - private String deliveryCity - город доставки + аннотация @NotBlank(message = "City is required") - не пустое
@@ -136,7 +119,7 @@
   - private String ccNumber - номер карты для оплаты + аннотация @CreditCardNumber(message = "Not a valid credit card number") - валидация введенного номера карты от Hibernate Validator
   - private String ccExpiration - срок действия карты оплаты + аннотация  @Pattern(regexp = "^(0[1-9]|1[0-2])/([2-9][0-9])$", message = "Must be formatted MM/YY") - валидация даты по регулярному выражению
   - private String ccCVV - CVV карты + аннотация @Digits(integer=3, fraction=0, message="Invalid CVV") - валидация CVV
-  - (@Column("tacos")) List<TacoUDT> tacos - список тако в заказе, хранится в столбце tacos
+  - List<Taco> tacos - список тако в заказе, хранится в столбце tacos
 
   ##### Методы:
   - public void addTaco(Taco taco) - добавление тако в список тако
@@ -145,7 +128,7 @@
 
 - #### IngredientByIdConverter
   Класс для конвертации строкового представления ингридиента, полученного из POST формы html в конкретный объект Ingridient для добавления его в Taco
-  Реализует интерфейс org.springframework.core.convert.converter.Converter<String, IngredientUDT>
+  Реализует интерфейс org.springframework.core.convert.converter.Converter<String, Ingredient>
 
   ##### Аннотации:
   - @Component - аннотация для Spring, чтобы сделать bean
@@ -154,7 +137,7 @@
   - private final IngredientRepository ingredientRepository - подгружаем БД с ингридиентами
 
   ##### Методы:
- - (@Override) public IngredientUDT convert(String id) - получает строковый id ингридиента и возвращает экз. IngredientUDT
+ - (@Override) public Ingredient convert(String id) - получает строковый id ингридиента и возвращает экз. Ingredient
 
 ### config
 
@@ -176,15 +159,6 @@
   ##### Методы:
   - (@Bean) public ApplicationRunner dataLoader(IngredientRepository repo) - загружаем в репозиторий ингридиентов ингридиенты
  
-### utils
-
-- #### TacoUDRUtils
-  Вспомогательный класс, конвертирующий модели в User-Defined Type
-
-  ##### Методы:
-  - public static IngredientUDT toIngredientUDT(Ingredient ingredient) - конвертирует Ingredient в IngredientUDT
-  - public static TacoUDT toTacoUDT(Taco taco) - конвертирует Taco в TacoUDT
-
 
 ## HTML-шаблоны
 
